@@ -26,13 +26,24 @@
         /* --- UI SELEÇÃO (IGUAL AO SEU PRINT) --- */
         .main-ui { position: relative; z-index: 100; padding: 40px 20px; text-align: center; max-width: 600px; margin: 0 auto; }
         .receptacle-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; }
+
+        @keyframes box-glow {
+            0% { transform: scale(1); box-shadow: 0 0 5px rgba(255,255,255,0.1); }
+            50% { transform: scale(1.02); box-shadow: 0 0 20px var(--color-active); }
+            100% { transform: scale(1); box-shadow: 0 0 5px rgba(255,255,255,0.1); }
+        }
         
         .soul-box { 
             aspect-ratio: 2/3; border: 1px solid #333; background: #000; 
             display: flex; align-items: center; justify-content: center; position: relative;
-            transition: 0.3s; overflow: hidden; cursor: pointer;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .soul-box.active { border: 1px solid var(--color-active); box-shadow: inset 0 0 15px rgba(var(--color-active-rgb), 0.2); }
+        .soul-box.active { 
+             animation: box-glow 2s infinite ease-in-out;
+             border: 2px solid var(--color-active) !important;
+             z-index: 10;
+        }
+
         
         .soul-img-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.3; filter: grayscale(1); transition: 0.5s; }
         .soul-box.active .soul-img-bg { opacity: 0.8; filter: grayscale(0); }
@@ -53,10 +64,52 @@
         .btn-ctrl { background: none; border: 1px solid #444; color: #fff; width: 25px; height: 25px; font-family: var(--font-terminal); cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; }
         .btn-ctrl:active { background: #fff; color: #000; }
 
-        .mid-row { display: grid; grid-template-columns: 1fr 100px; gap: 15px; margin: 20px 0; }
-        .inv-box { border: 1px solid #222; padding: 10px; min-height: 100px; background: rgba(255,255,255,0.02); }
+        /* Ajuste para alinhar inventário (esquerda) e dado+arma (direita) */
+        .mid-row { 
+            display: grid; 
+            grid-template-columns: 1fr 80px; /* Inventário largo, área da arma 80px */
+            gap: 10px; 
+            margin: 15px 0; 
+            align-items: start;
+        }
+
+        .inv-box { border: 1px solid #222; padding: 8px; min-height: 120px; background: rgba(255,255,255,0.02); }
+
+        /* Estilo do Botão de Dado Rápido */
+        .dice-btn {
+            width: 100%;
+            aspect-ratio: 1/1;
+            border: 1px solid var(--color-active);
+            background: #000;
+            color: var(--color-active);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-bottom: 8px; /* Espaço entre dado e arma */
+            box-shadow: inset 0 0 10px rgba(var(--color-active-rgb), 0.2);
+        }
+
+        .weapon-box { 
+            width: 100%; 
+            aspect-ratio: 1/1; 
+            border: 1px solid #333; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: #050505; 
+            cursor: pointer; 
+        }
+
         .weapon-box { border: 1px solid var(--color-active); display: flex; align-items: center; justify-content: center; background: #050505; cursor: pointer; position: relative; overflow: hidden; }
-        .weapon-img { max-width: 90%; max-height: 90%; object-fit: contain; filter: drop-shadow(0 0 5px var(--color-active)); }
+        .weapon-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Não distorce a imagem */
+            filter: drop-shadow(0 0 5px var(--color-active));
+        }
+
 
         .inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; }
 
@@ -74,6 +127,94 @@
         @keyframes heart-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
         .float-dmg { position: fixed; font-family: var(--font-terminal); font-size: 4rem; z-index: 1000002; animation: floatUp 0.8s forwards; pointer-events: none; color: red; font-weight: bold; text-shadow: 0 0 10px #000; }
         @keyframes floatUp { 0% { transform: translate(-50%, -50%); opacity: 1; } 100% { transform: translate(-50%, -150%); opacity: 0; } }
+
+        /* Animação pulsante nos quadrados ao passar o mouse */
+        .soul-box:hover {
+            transform: scale(1.05);
+            border-color: #fff;
+            filter: brightness(1.2);
+        }
+
+        /* Efeito de TV Desligando */
+        .crt-off {
+            position: fixed;
+            inset: 0;
+            background: #fff;
+            z-index: 1000000;
+            pointer-events: none;
+            animation: crt-shutdown 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+
+        @keyframes crt-shutdown {
+            0% { transform: scaleY(1) scaleX(1); opacity: 1; }
+            40% { transform: scaleY(0.005) scaleX(1.2); background: #fff; }
+            70% { transform: scaleY(0.005) scaleX(0.5); background: #fff; filter: brightness(2); }
+            100% { transform: scaleY(0) scaleX(0); background: #fff; opacity: 0; }
+        }
+
+        /* Estilo da Frase de Zombaria */
+        #zombaria-screen {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 999999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .btn-load {
+            background: none;
+            border: 1px solid #444;
+            color: #444;
+            padding: 8px;
+            font-family: var(--font-terminal);
+            font-size: 0.7rem;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-load:active { color: #fff; border-color: #fff; }
+
+        .dice-quick-btn {
+            width: 35px;
+            height: 35px;
+            border: 1px solid var(--color-active);
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(var(--color-active-rgb), 0.3);
+            transition: 0.2s;
+            border-radius: 4px;
+            margin-bottom: 2px;
+        }
+
+        .dice-quick-btn:active {
+            transform: scale(0.9) rotate(20deg);
+            background: var(--color-active);
+        }
+
+        .dice-quick-btn img {
+            filter: invert(1); /* Deixa o ícone branco caso use uma imagem preta */
+        }
+
+
+        #skill-display-list {
+    max-height: 100px; /* Ajuste conforme o tamanho da tela */
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Deixa a barra de rolagem fininha e discreta */
+#skill-display-list::-webkit-scrollbar { width: 3px; }
+#skill-display-list::-webkit-scrollbar-thumb { background: var(--color-active); }
+
+
     </style>
 </head>
 <body>
@@ -112,6 +253,7 @@
     <div style="font-size:0.6rem; color:#444; margin-bottom:10px;">[ SELECIONE SUA ALMA ]</div>
     <h2 id="name-label" class="name-label">DETERMINAÇÃO</h2>
     <button class="btn-sheet" style="width:100%; border-color:#fff" onclick="initTransition()">ACEITAR DESTINO</button>
+    <button class="btn-load" id="btn-load-game" onclick="loadGame()">[ CARREGAR REGISTRO ANTERIOR ]</button>
 </main>
 
 
@@ -148,28 +290,49 @@
             <button class="btn-ctrl" onclick="adjABT(10)">+</button>
         </div>
 
-        <div class="mid-row">
-            <div class="inv-box">
-                <div style="display:flex; justify-content:space-between; font-size:0.6rem; color:#444; margin-bottom:5px; font-family:var(--font-terminal)">
-                    <span>INVENTÁRIO</span>
-                    <button onclick="openModal('item-modal')" style="background:none; border:none; color:var(--color-active); font-weight:bold; cursor:pointer;">[+]</button>
-                </div>
-                <div id="inv-list" class="inv-grid"></div>
+<div class="mid-row" style="display: grid; grid-template-columns: 1fr 80px; gap: 10px; margin-top: 15px;">
+    <!-- COLUNA ESQUERDA: INV + SKILLS -->
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+        <!-- Inventário -->
+        <div class="inv-box">
+            <div style="display:flex; justify-content:space-between; font-size:0.6rem; color:#444; margin-bottom:5px;">
+                <span>INVENTÁRIO</span>
+                <button onclick="openModal('item-modal')" style="background:none; border:none; color:var(--color-active); cursor:pointer;">[+]</button>
             </div>
-            <div class="weapon-box" onclick="document.getElementById('weapon-input').click()">
-                <img id="weapon-img" class="weapon-img" src="">
-                <input type="file" id="weapon-input" style="display:none" accept="image/*" onchange="loadWeapon(this)">
-            </div>
+            <div id="inv-list" class="inv-grid"></div>
         </div>
 
-        <div class="action-grid">
-            <button class="btn-sheet" style="border-color:#f00" onclick="openModal('attack-panel')">ATAQUE</button>
-            <button class="btn-sheet" style="border-color:#ff00ff" onclick="openModal('magic-panel')">MAGIA</button>
-            <button class="btn-sheet" onclick="takeDamage()">DANO</button>
-            <button class="btn-sheet" onclick="addExp()">+ EXP</button>
-            <button class="btn-sheet" onclick="spare()" style="grid-column: span 2; border-color:#ffff00">POUPAR</button>
-            <button class="btn-sheet" style="grid-column: span 2; border:none; color:#333; margin-top:10px" onclick="location.reload()">REINICIAR</button>
+        <!-- Habilidades -->
+        <div class="inv-box" style="min-height: 80px;">
+            <div style="display:flex; justify-content:space-between; font-size:0.6rem; color:#444; margin-bottom:5px;">
+                <span>HABILIDADES</span>
+                <button onclick="openModal('skill-modal')" style="background:none; border:none; color:var(--color-active); cursor:pointer;">[+]</button>
+            </div>
+            <div id="skill-display-list" style="font-size: 0.75rem; color: #aaa; line-height: 1.2;"></div>
         </div>
+    </div>
+
+    <!-- COLUNA DIREITA: DADO + ARMA -->
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button class="dice-btn" onclick="rollDice(20)" style="width:100%; aspect-ratio:1/1; border:1px solid var(--color-active); background:#000; color:var(--color-active); font-size:1.5rem; cursor:pointer;">🎲</button>
+        
+        <div class="weapon-box" onclick="document.getElementById('weapon-input').click()" style="width:100%; aspect-ratio:1/1; border:1px solid #333; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+            <span id="weapon-placeholder" style="color:#333; font-size:0.5rem; text-align:center;">[+] ARMA</span>
+            <img id="weapon-img" src="" style="width:100%; height:100%; object-fit:contain; display:none; position:absolute;">
+        </div>
+        <input type="file" id="weapon-input" style="display:none" accept="image/*" onchange="loadWeapon(this)">
+    </div>
+</div>
+
+<!-- BOTÕES DE AÇÃO (Abaixo de tudo) -->
+<div class="action-grid" style="margin-top: 15px;">
+    <button class="btn-sheet" style="border-color:#f00" onclick="openModal('attack-panel')">ATAQUE</button>
+    <button class="btn-sheet" style="border-color:#ff00ff" onclick="openModal('magic-panel')">MAGIA</button>
+    <button class="btn-sheet" onclick="takeDamage()">DANO</button>
+    <button class="btn-sheet" onclick="addExp()">+ EXP</button>
+    <button class="btn-sheet" onclick="spare()" style="grid-column: span 2; border-color:#ffff00">POUPAR</button>
+</div>
+
 
         <div id="spare-terminal" onclick="this.style.display='none'">
             <div id="spare-text" style="flex-grow: 1;"></div>
@@ -203,6 +366,15 @@
     </div>
 </div>
 
+<div id="skill-modal" class="modal" onclick="closeModals(event)">
+    <div class="modal-content" style="border-color: var(--color-active)">
+        <h3 style="margin-bottom:20px; font-family:var(--font-terminal)">NOVA HABILIDADE</h3>
+        <input type="text" id="sk-name" placeholder="NOME DA HABILIDADE" style="width:100%; padding:12px; background:#111; border:1px solid #333; color:#fff; margin-bottom:25px; font-family:var(--font-terminal);">
+        <button class="btn-sheet" style="width:100%; border-color:var(--color-active)" onclick="createSkill()">ADICIONAR</button>
+    </div>
+</div>
+
+
 <!-- GAME OVER -->
 <div id="game-over-screen">
     <div id="soul-anchor" style="position:relative; height:100px;"></div>
@@ -214,21 +386,82 @@
 
 <script>
     const CONFIG = {
-        'determinacao': { color: '#ff0000', hp: 20, magics: [{n:'ESPERANÇA', c:30, d:'Recupera 5 de HP.'}, {n:'DETERMINAR', c:100, d:'Cura todo o HP.'}] },
-        'coragem': { color: '#ffa500', hp: 35, magics: [{n:'SOCO BRAVO', c:40, d:'Ignora defesa.'}, {n:'RUGE', c:60, d:'Aumenta o AT.'}] },
-        'gentileza': { color: '#ffff00', hp: 25, magics: [{n:'ESCUDO', c:25, d:'Bloqueia dano.'}, {n:'CURA', c:50, d:'Cura 10 de HP.'}] },
-        'empatia': { color: '#ff69b4', hp: 18, magics: [{n:'ANALISA', c:20, d:'Preve ataques.'}, {n:'PRENDE', c:70, d:'Para o inimigo.'}] }
+        'determinacao': { 
+            color: '#ff0000', hp: 20, at: 15, df: 10,
+            skills: ['Persistir', 'Recusar'],
+            magics: [
+                {n: 'CORTE RUBRO', c: 20, d: 'Dano Crítico'}, 
+                {n: 'RECUSAR', c: 40, d: 'Cura 20 HP'}
+            ],
+            items: [
+                {n: 'Torta Toriel', h: 20}, {n: 'Doce Monstro', h: 10}, 
+                {n: 'Batata Frita', h: 15}, {n: 'Cachorro-Quente', h: 20}, {n: 'Donut Aranha', h: 12}
+            ]
+        },
+        'coragem': { 
+            color: '#ffa500', hp: 35, at: 22, df: 5,
+            skills: ['Avançar', 'Atropelar'],
+            magics: [
+                {n: 'IMPACTO LARANJA', c: 15, d: 'Atordoar'}, 
+                {n: 'INVESTIDA', c: 30, d: 'Dano Crítico'}
+            ],
+             items: [
+                {n: 'Luvas Robustas', h: 10}, 
+                {n: 'Bife Rosto', h: 25}, 
+                {n: 'Lanche Herói', h: 15}, 
+                {n: 'Chá Batalha', h: 10}, 
+                {n: 'Maçã Gelada', h: 15}
+            ]
+        },
+        'gentileza': { 
+            color: '#ffff00', hp: 25, at: 8, df: 20,
+            skills: ['Proteger', 'Doar'],
+            magics: [
+                {n: 'CURA AMARELA', c: 20, d: 'Cura 10 HP'}, 
+                {n: 'ESCUDO', c: 40, d: 'Defesa +15'}
+            ],
+            items: [
+                {n: 'Salada Flores', h: 25}, 
+                {n: 'Frigideira', h: 10}, 
+                {n: 'Sopa Almas', h: 20}, 
+                {n: 'Pão Caseiro', h: 15}, 
+                {n: 'Suco Luz', h: 10}
+            ]
+        },
+        'empatia': { 
+            color: '#ff69b4', hp: 18, at: 12, df: 12,
+                skills: ['Analisar', 'Acalmar'],
+            magics: [
+                {n: 'ELO ROSA', c: 15, d: 'Sente Almas'}, 
+                {n: 'ABRAÇO', c: 30, d: 'Cura Total'}
+            ],
+            items: [
+                {n: 'Chá Sorriso', h: 20}, {n: 'Doce Sonho', h: 15}, 
+                {n: 'Laço Rosa', h: 10}, {n: 'Água Pura', h: 12}, {n: 'Biscoito Coração', h: 18}
+            ]
+        }
+    };
+
+function populateInventory(key) {
+    const list = document.getElementById('inv-list');
+    list.innerHTML = ""; // Limpa itens antigos
+    
+    CONFIG[key].items.forEach(item => {
+        addItemToUI(item.n, item.h);
+    });
+    saveGame(); // Salva o novo estado
+}
+
+
+    const ZOMBARIAS = {
+        'determinacao': "* DETERMINAÇÃO? ISSO SÓ VAI TE FAZER SOFRER POR MAIS TEMPO.",
+        'coragem': "* CORAGEM É APENAS OUTRO NOME PARA BURRICE NESTE LUGAR.",
+        'gentileza': "* GENTILEZA? VOCÊ NÃO VAI DURAR NEM CINCO MINUTOS.",
+        'empatia': "* VOCÊ REALMENTE ACHA QUE ALGUÉM AQUI SE IMPORTA COM VOCÊ?"
     };
 
     let curKey = 'determinacao';
-    let curTP = 100;
-    let curABT = 100;
-    let curEXP = 0;
-    let curLV = 1;
-    let expToNext = 150;
-    let bonusDamage = 0;
-    let typingTimer;
-
+    let curTP = 100, curABT = 100, curEXP = 0, curLV = 1, expToNext = 150, bonusDamage = 0, typingTimer;
     const audio = new (window.AudioContext || window.webkitAudioContext)();
 
     function sfx(f, t, d, v) {
@@ -240,95 +473,107 @@
         } catch(e) {}
     }
 
-    // Carregar fotos salvas das almas ao iniciar
-    window.onload = () => {
-        ['determinacao', 'coragem', 'gentileza', 'empatia'].forEach(k => {
-            const saved = localStorage.getItem(`soul_bg_${k}`);
-            if(saved) {
-                const id = k.substring(0, 3);
-                document.getElementById(`img-${id}`).src = saved;
-            }
-        });
-    };
-
-    window.uploadSoulImg = function(key, input) {
-        if(input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const base64 = e.target.result;
-                const id = key.substring(0, 3);
-                document.getElementById(`img-${id}`).src = base64;
-                localStorage.setItem(`soul_bg_${key}`, base64);
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
+    // --- SISTEMA DE PERSISTÊNCIA (SAVE/LOAD) ---
+    function saveGame() {
+        const items = Array.from(document.getElementById('inv-list').children).map(it => ({
+            text: it.innerText,
+            heal: it.dataset.heal || 0
+        }));
+        const data = {
+            key: curKey, lv: curLV, exp: curEXP, next: expToNext, 
+            hp: document.getElementById('curr-hp').innerText,
+            mhp: document.getElementById('max-hp').innerText,
+            items: items
+        };
+        localStorage.setItem('receptaculo_save', JSON.stringify(data));
     }
 
+    window.loadGame = function() {
+        const saved = localStorage.getItem('receptaculo_save');
+        if(!saved) return alert("NENHUM REGISTRO ENCONTRADO.");
+        const d = JSON.parse(saved);
+        
+        curKey = d.key; curLV = d.lv; curEXP = d.exp; expToNext = d.next;
+        
+        document.getElementById('selection-screen').style.display = 'none';
+        document.getElementById('final-overlay').style.display = 'block';
+        
+        document.getElementById('sheet-name').innerText = curKey.toUpperCase();
+        document.getElementById('sheet-lv').innerText = curLV;
+        document.getElementById('sheet-exp').innerText = curEXP;
+        document.getElementById('next-lv-exp').innerText = expToNext;
+        document.getElementById('curr-hp').innerText = d.hp;
+        document.getElementById('max-hp').innerText = d.mhp;
+
+        // Recriar inventário salvo
+        const list = document.getElementById('inv-list');
+        list.innerHTML = "";
+        d.items.forEach(it => addItemToUI(it.text.split(' (')[0], it.heal));
+        
+        updateBars();
+        sfx(400, 'sine', 0.5, 0.1);
+    };
+
+    // --- TRANSIÇÃO E SELEÇÃO ---
     window.selectSoul = function(key, col, el) {
         curKey = key;
         document.documentElement.style.setProperty('--color-active', col);
         const r = parseInt(col.slice(1,3),16), g = parseInt(col.slice(3,5),16), b = parseInt(col.slice(5,7),16);
         document.documentElement.style.setProperty('--color-active-rgb', `${r},${g},${b}`);
-        
-        document.querySelectorAll('.soul-box').forEach(b => { 
-            b.classList.remove('active'); 
-            b.querySelector('.heart-soul').style.display = 'none'; 
-        });
-        el.classList.add('active'); 
-        el.querySelector('.heart-soul').style.display = 'block';
-        
+        document.querySelectorAll('.soul-box').forEach(b => { b.classList.remove('active'); b.querySelector('.heart-soul').style.display = 'none'; });
+        el.classList.add('active'); el.querySelector('.heart-soul').style.display = 'block';
         document.getElementById('name-label').innerText = key.toUpperCase();
         sfx(150, 'square', 0.1, 0.05);
-    }
+    };
 
     window.initTransition = function() {
-        sfx(80, 'sawtooth', 0.5, 0.2);
-        document.getElementById('selection-screen').style.display = 'none';
-        document.getElementById('final-overlay').style.display = 'block';
-        document.getElementById('sheet-name').innerText = curKey.toUpperCase();
-        document.getElementById('max-hp').innerText = CONFIG[curKey].hp;
-        document.getElementById('curr-hp').innerText = CONFIG[curKey].hp;
+    sfx(80, 'sawtooth', 0.8, 0.2);
+    const flash = document.createElement('div');
+    flash.className = 'crt-off';
+    document.body.appendChild(flash);
+    
+    setTimeout(() => {
+        flash.remove();
+        let zb = document.getElementById('zombaria-screen') || document.createElement('div');
+        zb.id = 'zombaria-screen'; document.body.appendChild(zb);
+        zb.style.display = 'flex';
+        zb.innerHTML = `<div style="font-family:var(--font-terminal); color:var(--color-active); font-size:1.4rem; text-align:center;">${ZOMBARIAS[curKey]}</div>`;
         
-        // Arma salva
-        const savedWep = localStorage.getItem(`wep_${curKey}`);
-        if(savedWep) document.getElementById('weapon-img').src = savedWep;
-        
-        updateBars();
-    }
+        setTimeout(() => {
+            zb.style.display = 'none';
+            document.getElementById('selection-screen').style.display = 'none';
+            document.getElementById('final-overlay').style.display = 'block';
+            
+            // Setup da Ficha
+            document.getElementById('sheet-name').innerText = curKey.toUpperCase();
+            document.getElementById('max-hp').innerText = CONFIG[curKey].hp;
+            document.getElementById('curr-hp').innerText = CONFIG[curKey].hp;
+            
+            // NOVIDADE: Gera os 5 itens consumíveis
+            populateInventory(curKey);
 
-    window.adjTP = function(v) {
-        curTP = Math.max(0, Math.min(100, curTP + v));
-        updateBars();
-        sfx(300 + curTP, 'sine', 0.1, 0.05);
-    }
+            // Dentro do setTimeout final da função initTransition:
+const listSkills = document.getElementById('skill-display-list');
+listSkills.innerHTML = ""; // Limpa antes de popular
+CONFIG[curKey].skills.forEach(s => addSkillToUI(s));
 
-    window.adjABT = function(v) {
-        curABT = Math.max(0, Math.min(100, curABT + v));
-        updateBars();
-        sfx(400 + curABT, 'square', 0.05, 0.02);
-    }
+// ... dentro do setTimeout final da sua função initTransition ...
+document.getElementById('final-overlay').style.display = 'block';
 
-    window.addExp = function() {
-        curEXP++;
-        if(curEXP >= expToNext) {
-            curLV++; curEXP = 0; expToNext *= 2; 
-            let maxHpEl = document.getElementById('max-hp');
-            let newMax = parseInt(maxHpEl.innerText) + 5;
-            maxHpEl.innerText = newMax;
-            document.getElementById('curr-hp').innerText = newMax;
-            bonusDamage += 5;
-            sfx(800, 'square', 0.6, 0.15);
-            if (navigator.vibrate) navigator.vibrate(100);
-        } else sfx(500, 'square', 0.05, 0.01);
-        document.getElementById('sheet-lv').innerText = curLV;
-        document.getElementById('sheet-exp').innerText = curEXP;
-        document.getElementById('next-lv-exp').innerText = expToNext;
-        updateBars();
-    }
+// CHAME ESTA FUNÇÃO AQUI:
+setupInitialSkills(curKey);
 
-    function updateBars() {
-        const c = parseInt(document.getElementById('curr-hp').innerText);
-        const m = parseInt(document.getElementById('max-hp').innerText);
+updateBars();
+saveGame();
+
+        }, 3000);
+    }, 500);
+};
+
+
+    // --- MECÂNICAS DA FICHA ---
+    window.updateBars = function() {
+        const c = parseInt(document.getElementById('curr-hp').innerText), m = parseInt(document.getElementById('max-hp').innerText);
         document.getElementById('hp-fill').style.width = (c/m*100) + "%";
         document.getElementById('tp-fill').style.width = curTP + "%";
         document.getElementById('tp-val').innerText = curTP + "%";
@@ -336,127 +581,260 @@
         document.getElementById('abt-val').innerText = curABT;
         document.getElementById('hp-fill').style.backgroundColor = (c/m < 0.2) ? "#f00" : "#ff0";
         if (c <= 0) triggerGameOver();
-    }
+    };
 
     window.takeDamage = function() {
         let c = document.getElementById('curr-hp');
         c.innerText = Math.max(0, parseInt(c.innerText) - 1);
         sfx(120, 'sawtooth', 0.2, 0.1);
-        if (navigator.vibrate) navigator.vibrate(20);
-        document.body.style.filter = "invert(1)";
-        setTimeout(() => document.body.style.filter = "none", 50);
-        updateBars();
+        updateBars(); saveGame();
+    };
+
+    window.addExp = function() {
+    if (curLV >= 20) {
+        document.getElementById('sheet-lv').innerText = "20 (MAX)";
+        document.getElementById('sheet-exp').innerText = "---";
+        document.getElementById('next-lv-exp').innerText = "---";
+        sfx(100, 'square', 0.1, 0.05); // Som de erro/limite
+        return; 
     }
+
+    curEXP += 1; // Ganha apenas 1 de EXP por clique
+
+    if (curEXP >= expToNext) {
+        curLV++;
+        curEXP = 0;
+        expToNext *= 2; // Dobra a exp necessária para o próximo nível
+
+        // Bônus de Atributos ao subir de nível
+        let m = document.getElementById('max-hp');
+        let newMax = parseInt(m.innerText) + 5;
+        m.innerText = newMax;
+        document.getElementById('curr-hp').innerText = newMax;
+        
+        // Aumenta AT e DF baseados na alma
+        document.getElementById('sheet-at').innerText = parseInt(document.getElementById('sheet-at').innerText) + 2;
+        document.getElementById('sheet-df').innerText = parseInt(document.getElementById('sheet-df').innerText) + 1;
+
+        bonusDamage += 2;
+        sfx(800, 'square', 0.6, 0.15);
+        if (navigator.vibrate) navigator.vibrate(100);
+    } else {
+        sfx(500, 'square', 0.05, 0.01);
+    }
+
+    // Atualiza interface
+    document.getElementById('sheet-lv').innerText = curLV >= 20 ? "20 (MAX)" : curLV;
+    document.getElementById('sheet-exp').innerText = curLV >= 20 ? "---" : curEXP;
+    document.getElementById('next-lv-exp').innerText = curLV >= 20 ? "---" : expToNext;
+    
+    updateBars();
+    saveGame();
+};
+
+
+    // --- ITENS (COM CURA E REMOÇÃO) ---
+    window.createItem = function() {
+        const n = document.getElementById('it-name').value.toUpperCase();
+        const h = parseInt(document.getElementById('it-heal').value) || 0;
+        if(!n.trim()) return;
+        addItemToUI(n, h);
+        document.getElementById('it-name').value = ""; document.getElementById('it-heal').value = "";
+        document.getElementById('item-modal').style.display = 'none';
+        saveGame();
+    };
+
+    function addItemToUI(name, heal) {
+        const li = document.createElement('div');
+        li.className = 'btn-sheet'; li.dataset.heal = heal;
+        li.style.cssText = `font-size:0.75rem; border-color:${heal > 0 ? '#0f0' : '#333'}; padding:8px; display:flex; justify-content:center; align-items:center; text-align:center;`;
+        li.innerText = heal > 0 ? `${name} (+${heal})` : name;
+        li.onclick = () => {
+            if(heal > 0) {
+                let cur = document.getElementById('curr-hp'), max = parseInt(document.getElementById('max-hp').innerText);
+                if(parseInt(cur.innerText) < max) {
+                    cur.innerText = Math.min(max, parseInt(cur.innerText) + parseInt(heal));
+                    sfx(600, 'sine', 0.4, 0.1); li.remove(); updateBars(); saveGame();
+                }
+            } else { li.remove(); sfx(200, 'square', 0.2, 0.05); saveGame(); }
+        };
+        document.getElementById('inv-list').appendChild(li);
+    }
+
+    // --- OUTRAS FUNÇÕES ---
+    window.adjTP = v => { curTP = Math.max(0, Math.min(100, curTP + v)); updateBars(); saveGame(); };
+    window.adjABT = v => { curABT = Math.max(0, Math.min(100, curABT + v)); updateBars(); saveGame(); };
+    
+    window.rollDice = function(f) {
+        const r = Math.floor(Math.random()*f)+1;
+        document.getElementById('attack-panel').style.display = 'none';
+        const sl = document.getElementById('slash'); sl.style.display = 'block'; sfx(150, 'sawtooth', 0.3, 0.1);
+        setTimeout(() => {
+            sl.style.display = 'none';
+            const t = document.createElement('div'); t.className = 'float-dmg'; t.innerText = r + bonusDamage;
+            t.style.left = '50%'; t.style.top = '50%'; document.body.appendChild(t);
+            setTimeout(() => t.remove(), 800);
+        }, 300);
+    };
+
+    window.spare = function() {
+        const d1 = Math.floor(Math.random()*20)+1, d2 = Math.floor(Math.random()*20)+1, total = d1+d2;
+        const term = document.getElementById('spare-terminal'), txt = document.getElementById('spare-text');
+        term.style.display = 'flex'; txt.innerHTML = ""; clearInterval(typingTimer);
+        let msg = `* Você tenta POUPAR...\n* Dados: ${d1}+${d2}=${total}\n* Status: ${total>=20?'SUCESSO':'FALHA'}`;
+        let i = 0; typingTimer = setInterval(() => {
+            if(i < msg.length) { txt.innerHTML += msg[i]==="\n"?"<br>":msg[i]; sfx(150,'square',0.05,0.01); i++; }
+            else clearInterval(typingTimer);
+        }, 40);
+    };
 
     function triggerGameOver() {
         document.getElementById('final-overlay').style.display = 'none';
-        const screen = document.getElementById('game-over-screen');
-        screen.style.display = 'flex';
+        document.getElementById('game-over-screen').style.display = 'flex';
         const anchor = document.getElementById('soul-anchor');
         anchor.innerHTML = '<span id="dying-soul" style="color:var(--color-active); font-size:4rem">❤</span>';
         sfx(40, 'sawtooth', 1.2, 0.4);
         setTimeout(() => {
             document.getElementById('dying-soul').style.display = 'none';
-            for(let i=0; i<12; i++) {
-                const p = document.createElement('div');
-                p.innerText = '❤'; p.style.position = 'absolute'; p.style.color = 'var(--color-active)';
-                p.style.transition = '1.5s cubic-bezier(0,0,0,1)';
-                anchor.appendChild(p);
-                setTimeout(() => {
-                    p.style.transform = `translate(${(Math.random()-0.5)*500}px, ${(Math.random()-0.5)*500}px) rotate(${Math.random()*720}deg)`;
-                    p.style.opacity = '0';
-                }, 20);
+            for(let i=0; i<10; i++) {
+                const p = document.createElement('div'); p.innerText = '❤'; p.style.position = 'absolute'; p.style.color = 'var(--color-active)';
+                p.style.transition = '1.5s'; anchor.appendChild(p);
+                setTimeout(() => { p.style.transform = `translate(${(Math.random()-0.5)*400}px, ${(Math.random()-0.5)*400}px)`; p.style.opacity = '0'; }, 20);
             }
-            setTimeout(() => {
-                document.getElementById('go-text').style.opacity = "1";
-                screen.querySelector('button').style.opacity = "1";
-            }, 1000);
+            setTimeout(() => { document.getElementById('go-text').style.opacity = "1"; }, 1000);
         }, 1200);
     }
 
-    window.openModal = function(id) {
-        document.getElementById(id).style.display = 'flex';
-        if(id === 'magic-panel') renderMagics();
-    }
-
-    window.closeModals = function(e) {
-        if(e.target.classList.contains('modal')) e.target.style.display = 'none';
-    }
+    window.openModal = id => { document.getElementById(id).style.display = 'flex'; if(id==='magic-panel') renderMagics(); };
+    window.closeModals = e => { if(e.target.classList.contains('modal')) e.target.style.display = 'none'; };
 
     function renderMagics() {
         const list = document.getElementById('magic-list'); list.innerHTML = "";
         CONFIG[curKey].magics.forEach(m => {
-            const b = document.createElement('button');
-            b.className = 'btn-sheet'; b.style.borderColor = "#ff00ff"; b.style.textAlign = "left"; b.style.display = "flex"; b.style.flexDirection = "column";
-            b.innerHTML = `<div style="display:flex; justify-content:space-between; width:100%; color:#ff00ff; font-weight:bold;"><span>${m.n}</span><span>(${m.c}%)</span></div><div style="font-size:0.65rem; color:#888; font-style:italic;">${m.d}</div>`;
-            b.onclick = () => {
-                if(curTP >= m.c) { adjTP(-m.c); document.getElementById('magic-panel').style.display = 'none'; sfx(600, 'sine', 0.5, 0.1); 
-                    if(m.n === 'ESPERANÇA') { let hpC = document.getElementById('curr-hp'); hpC.innerText = Math.min(parseInt(document.getElementById('max-hp').innerText), parseInt(hpC.innerText) + 5); }
-                    else if(m.n === 'DETERMINAR') { document.getElementById('curr-hp').innerText = document.getElementById('max-hp').innerText; }
-                    updateBars();
-                } else sfx(100, 'square', 0.1, 0.1);
-            };
+            const b = document.createElement('button'); b.className = 'btn-sheet'; b.style.borderColor = "#ff00ff";
+            b.innerHTML = `<div style="display:flex; justify-content:space-between; width:100%"><span>${m.n}</span><span>${m.c}%</span></div>`;
+            b.onclick = () => { if(curTP>=m.c) { adjTP(-m.c); document.getElementById('magic-panel').style.display='none'; } };
             list.appendChild(b);
         });
     }
 
-    window.createItem = function() {
-        const n = document.getElementById('it-name').value.toUpperCase();
-        const h = parseInt(document.getElementById('it-heal').value) || 0;
-        if(!n.trim()) return;
-        const li = document.createElement('div');
-        li.className = 'btn-sheet'; li.style.cssText = `font-size:0.75rem; border-color:${h > 0 ? '#0f0' : '#333'}; padding:8px; display:flex; justify-content:center; align-items:center; text-align:center;`;
-        li.innerText = h > 0 ? `${n} (+${h})` : n;
-        li.onclick = () => {
-            if(h > 0) { let cur = document.getElementById('curr-hp'); let max = parseInt(document.getElementById('max-hp').innerText);
-                if(parseInt(cur.innerText) < max) { cur.innerText = Math.min(max, parseInt(cur.innerText) + h); sfx(600, 'sine', 0.4, 0.1); li.remove(); updateBars(); }
-            } else { li.remove(); sfx(200, 'square', 0.2, 0.05); }
-        };
-        document.getElementById('inv-list').appendChild(li);
-        document.getElementById('it-name').value = ""; document.getElementById('it-heal').value = "";
-        document.getElementById('item-modal').style.display = 'none';
-    }
-
-    window.rollDice = function(f) {
-        const roll = Math.floor(Math.random()*f)+1;
-        const total = roll + bonusDamage;
-        document.getElementById('attack-panel').style.display = 'none';
-        const sl = document.getElementById('slash'); sl.style.display = 'block'; sfx(150, 'sawtooth', 0.3, 0.1);
-        setTimeout(() => { sl.style.display = 'none';
-            const t = document.createElement('div'); t.className = 'float-dmg'; t.innerText = bonusDamage > 0 ? `${roll}+${bonusDamage}` : roll;
-            t.style.left = '50%'; t.style.top = '50%'; t.style.color = (roll === f) ? '#ff0' : '#f00'; 
-            document.body.appendChild(t);
-            setTimeout(() => { t.innerText = total; setTimeout(() => t.remove(), 600); }, 500);
-        }, 300);
-    }
-
-    window.spare = function() {
-        const d1 = Math.floor(Math.random()*20)+1; const d2 = Math.floor(Math.random()*20)+1; const total = d1 + d2;
-        const terminal = document.getElementById('spare-terminal'); const textEl = document.getElementById('spare-text');
-        terminal.style.display = 'flex'; textEl.innerHTML = ""; clearInterval(typingTimer);
-        let status = total >= 20 ? "SUCESSO" : "FALHA"; let color = total >= 20 ? "#ffff00" : "#ff0000";
-        let msg = `* Você tenta POUPAR...\n* Dados: ${d1} + ${d2} = ${total}\n* Status: <span style="color:${color}">${status}</span>`;
-        let i = 0; typingTimer = setInterval(() => {
-            if(i < msg.length) {
-                if(msg.substr(i, 7) === "<span s") { let endTag = msg.indexOf("</span>", i) + 7; textEl.innerHTML += msg.substring(i, endTag); i = endTag; }
-                else { textEl.innerHTML += msg[i] === "\n" ? "<br>" : msg[i]; sfx(150, 'square', 0.05, 0.01); i++; }
-            } else clearInterval(typingTimer);
-        }, 40);
-    }
-
-    window.loadWeapon = function(i) {
-        if(i.files && i.files[0]) {
-            const r = new FileReader();
-            r.onload = (e) => { document.getElementById('weapon-img').src = e.target.result; localStorage.setItem(`wep_${curKey}`, e.target.result); };
-            r.readAsDataURL(i.files[0]);
-        }
-    }
-
-    const cv = document.getElementById('snow-canvas'); const cx = cv.getContext('2d');
-    let pts = [];
-    function rz() { cv.width = window.innerWidth; cv.height = window.innerHeight; pts = Array.from({length:20}, () => ({x:Math.random()*cv.width, y:Math.random()*cv.height, s:Math.random()*1+0.5})); }
+    const cv = document.getElementById('snow-canvas'), cx = cv.getContext('2d');
+    let pts = []; function rz() { cv.width = window.innerWidth; cv.height = window.innerHeight; pts = Array.from({length:20}, () => ({x:Math.random()*cv.width, y:Math.random()*cv.height, s:Math.random()*1+0.5})); }
     function lp() { cx.clearRect(0,0,cv.width,cv.height); cx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--color-active'); pts.forEach(p => { cx.fillRect(p.x, p.y, 2, 2); p.y += p.s; if(p.y > cv.height) p.y = -5; }); requestAnimationFrame(lp); }
     window.addEventListener('resize', rz); rz(); lp();
+
+    // Função para disparar o clique no input escondido
+window.triggerWeaponUpload = function() {
+    document.getElementById('weapon-input').click();
+};
+
+// Função para processar a imagem escolhida
+window.loadWeapon = function(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const imgData = e.target.result;
+            const imgEl = document.getElementById('weapon-img');
+            const placeholder = document.getElementById('weapon-placeholder');
+            
+            // Atualiza a imagem na tela
+            imgEl.src = imgData;
+            imgEl.style.display = 'block';
+            if(placeholder) placeholder.style.display = 'none';
+            
+            // Salva no localStorage vinculado à alma atual (ex: wep_gentileza)
+            localStorage.setItem(`wep_${curKey}`, imgData);
+            
+            sfx(500, 'sine', 0.2, 0.1);
+        };
+        
+        reader.readAsDataURL(input.files[0]);
+    }
+};
+
+// Adicione isso dentro da sua função initTransition ou loadGame para carregar a arma salva:
+function refreshWeaponDisplay() {
+    const savedWep = localStorage.getItem(`wep_${curKey}`);
+    const imgEl = document.getElementById('weapon-img');
+    const placeholder = document.getElementById('weapon-placeholder');
+    
+    if (savedWep && imgEl) {
+        imgEl.src = savedWep;
+        imgEl.style.display = 'block';
+        if(placeholder) placeholder.style.display = 'none';
+    } else {
+        if(imgEl) imgEl.style.display = 'none';
+        if(placeholder) placeholder.style.display = 'block';
+    }
+}
+
+// Função para criar habilidade manualmente
+window.createSkill = function() {
+    const n = document.getElementById('sk-name').value.toUpperCase();
+    if(!n.trim()) return;
+    
+    addSkillToUI(n);
+    
+    document.getElementById('sk-name').value = "";
+    document.getElementById('skill-modal').style.display = 'none';
+    saveGame();
+};
+
+function addSkillToUI(name) {
+    const list = document.getElementById('skill-display-list');
+    if(!list) return; // Garante que o ID existe no HTML
+    
+    const div = document.createElement('div');
+    div.style.cssText = "border-bottom: 1px solid #111; padding: 4px 0; font-size: 0.75rem; color: #aaa;";
+    div.innerHTML = `<span style="color:var(--color-active)">•</span> ${name}`;
+    
+    // Clique para remover (útil no mobile)
+    div.onclick = () => { if(confirm("REMOVER HABILIDADE?")) { div.remove(); saveGame(); } };
+    
+    list.appendChild(div);
+}
+
+
+// Chame isso na sua função initTransition para cada alma
+function setupInitialSkills(key) {
+    const list = document.getElementById('skill-display-list');
+    list.innerHTML = "";
+    CONFIG[key].skills.forEach(s => addSkillToUI(s));
+}
+
+function setupInitialSkills(key) {
+    const list = document.getElementById('skill-display-list');
+    if (!list) return;
+    list.innerHTML = ""; // Limpa a lista anterior
+
+    const alma = CONFIG[key];
+
+    // 1. Adiciona as Habilidades Passivas (ex: Persistir, Avançar)
+    alma.skills.forEach(s => {
+        const div = document.createElement('div');
+        div.style.cssText = "border-bottom: 1px solid #111; padding: 4px 0; font-size: 0.75rem; color: #aaa;";
+        div.innerHTML = `<span style="color:var(--color-active)">•</span> ${s.toUpperCase()}`;
+        list.appendChild(div);
+    });
+
+    // 2. Adiciona as Magias (Nome + Custo + Descrição)
+    alma.magics.forEach(m => {
+        const div = document.createElement('div');
+        div.style.cssText = "border-bottom: 1px solid #222; padding: 6px 0; font-size: 0.7rem; color: #eee; line-height: 1.2;";
+        div.innerHTML = `
+            <div style="color: #ff00ff; font-weight: bold; display: flex; justify-content: space-between;">
+                <span>★ ${m.n}</span>
+                <span style="font-size: 0.6rem;">${m.c}% TP</span>
+            </div>
+            <div style="color: #666; font-style: italic; font-size: 0.65rem;">${m.d}</div>
+        `;
+        list.appendChild(div);
+    });
+}
+
+
 </script>
+
 </body>
 </html>
